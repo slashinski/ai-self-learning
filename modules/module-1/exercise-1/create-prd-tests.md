@@ -16,7 +16,7 @@
 - headings: Product Overview, Features, Non-Functional, Key Implementation, Scope Boundaries, Success Metrics, Definition of Done, Dependencies, Assumptions, Open Questions
 - headings: In Scope, Out of Scope
 - count: (?is)\bgiven\b.{0,400}?\bwhen\b.{0,400}?\bthen\b | 5+ | Given/When/Then acceptance criteria
-- no-unmeasured: (?i)\b(?:fast|responsive|accurate)\b
+- no-unmeasured: fast, responsive, accurate
 
 ## Test Case 1: PRD Contains Required Sections
 

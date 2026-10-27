@@ -115,9 +115,13 @@ def run_claude(prompt, model, clean=False):
     CLAUDE.md is not loaded into a baseline. It does not remove user-level config
     or the default system prompt.
     """
-    cwd = tempfile.mkdtemp(prefix="eval-baseline-") if clean else None
-    result = subprocess.run(["claude", "-p", "--model", model, "--output-format", "json"],
-                            input=prompt, capture_output=True, text=True, cwd=cwd)
+    cmd = ["claude", "-p", "--model", model, "--output-format", "json"]
+    cwd = None
+    if clean:
+        # No tools, so the model cannot try to save files or call services during a baseline.
+        cmd += ["--tools", ""]
+        cwd = tempfile.mkdtemp(prefix="eval-baseline-")
+    result = subprocess.run(cmd, input=prompt, capture_output=True, text=True, cwd=cwd)
     if result.returncode != 0:
         fail(f"Claude CLI failed ({result.returncode}): {result.stderr.strip()}")
     try:
