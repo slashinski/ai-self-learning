@@ -25,7 +25,6 @@
 **Expected Output Criteria:**
 - PRD contains a problem statement and why it exists.
 - PRD contains personas, use cases, user stories, and acceptance criteria(AC) adhering to the format of Given/When/Then behavior.
-- PRD contains technical requirements and constraints to understand the how.
 - PRD contains non-functional requirements to understand the quality and performance expectations.
 - PRD contains scope and boundaries to understand what is in scope and out of scope.
 - PRD contains success metrics to understand the measure of success.
@@ -44,7 +43,6 @@
 
 **Expected Output Criteria:**
 - PRD explicitly defines acceptable timer drift tolerance (ex: plus/minus 2 seconds over a 25 minute session)
-- PRD uses timestamps driven from `Date.now()`.
 - PRD calls out the issue of background throttling and identifies how to mitigate.
 - PRD addresses the question, "if a laptop sleeps mid-session, the app must decide what to do on wake?" (example: continue, complete, or invalidate).
 - PRD specifies whether or not pause timer is acceptable
