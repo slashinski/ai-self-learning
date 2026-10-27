@@ -1,0 +1,1 @@
+Write a scope document for a Pomodoro timer application with 25-minute work intervals, 5-minute break intervals, session tracking, and a weekly productivity heat map.

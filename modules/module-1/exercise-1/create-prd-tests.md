@@ -12,11 +12,11 @@
 - count: ^\*\*Status:\*\*\s*Draft | 1 | status metadata line
 - headings: Changelog
 - count: ^\|\s*Version\s*\|\s*Date\s*\|\s*Author\s*\|\s*Changes\s*\| | 1 | changelog table header
-- changelog-consistency: PRD version and date match the topmost data row, and all four fields contain values
+- changelog: PRD version and date match the topmost data row, and all four fields contain values
 - headings: Product Overview, Features, Non-Functional, Key Implementation, Scope Boundaries, Success Metrics, Definition of Done, Dependencies, Assumptions, Open Questions
 - headings: In Scope, Out of Scope
 - count: (?is)\bgiven\b.{0,400}?\bwhen\b.{0,400}?\bthen\b | 5+ | Given/When/Then acceptance criteria
-- no-vague-terms: (?i)\b(?:fast|responsive|accurate)\b
+- no-unmeasured: (?i)\b(?:fast|responsive|accurate)\b
 
 ## Test Case 1: PRD Contains Required Sections
 

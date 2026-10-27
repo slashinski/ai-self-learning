@@ -57,6 +57,7 @@ import json
 import re
 import subprocess
 import sys
+import tempfile
 from datetime import datetime
 from pathlib import Path
 
@@ -104,15 +105,19 @@ def bullets(block):
     return [line.lstrip("- ").strip() for line in block.splitlines() if line.startswith("- ")]
 
 
-def run_claude(prompt, model):
+def run_claude(prompt, model, clean=False):
     """Call the locally authenticated Claude CLI. The prompt goes in on stdin.
 
     --output-format json returns the reply in "result" and the usage in "usage",
     "modelUsage", and "total_cost_usd" (fields verified against CLI 2.1.310).
     Every call is recorded in USAGE so the run log can report tokens and cost.
+    clean=True runs from an empty folder outside the project, so the project's
+    CLAUDE.md is not loaded into a baseline. It does not remove user-level config
+    or the default system prompt.
     """
+    cwd = tempfile.mkdtemp(prefix="eval-baseline-") if clean else None
     result = subprocess.run(["claude", "-p", "--model", model, "--output-format", "json"],
-                            input=prompt, capture_output=True, text=True)
+                            input=prompt, capture_output=True, text=True, cwd=cwd)
     if result.returncode != 0:
         fail(f"Claude CLI failed ({result.returncode}): {result.stderr.strip()}")
     try:
@@ -591,7 +596,7 @@ def main():
     results_dir.mkdir(parents=True, exist_ok=True)
     paths = {
         "prd": results_dir / f"{args.skill}-{args.artifact}.md",
-        "baseline": results_dir / f"{args.skill}-baseline-{args.artifact}.md",
+        "baseline": results_dir / f"{args.artifact}.md",
         "results": results_dir / f"{args.skill}-results.md",
         "json": results_dir / f"{args.skill}-results.json",
         "log": results_dir / f"{args.skill}-run.log.md",
@@ -623,7 +628,8 @@ def main():
     if graded is not None:
         outputs = [graded] * len(tests)
     elif args.bare:
-        outputs = [run_claude(strip_frontmatter(args.bare.read_text()), args.model)] * len(tests)
+        # One bare output, shared by every test case, as the exercise specifies.
+        outputs = [run_claude(strip_frontmatter(args.bare.read_text()), args.model, clean=True)] * len(tests)
     elif args.per_input:
         outputs = [generate(body, t["input"], args.model) for t in tests]
     else:
