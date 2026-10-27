@@ -1,0 +1,10 @@
+## Finding [N]
+
+- Agent: [adversarial-agents/<name>.skill.md]
+- Output reviewed: [file path]
+- Severity: [blocker | major | minor | nit]
+- Finding: [What the agent reported]
+- Evidence: [Quote or location in the reviewed output]
+- Classification: [EC gap | skill gap | false positive]
+- Caught by the evaluator already: [yes | no]
+- Action taken: [New or tightened EC | skill change | none, and why]
