@@ -407,11 +407,13 @@ def summarize(deterministic, judged, skipped_judge, score):
     if judged:
         avg = sum(v["score"] for v in verdicts) / len(verdicts)
         lines.append(f"| LLM judge | {'PASS' if judge_ok else 'FAIL'} | {judge_pass} of {len(verdicts)} criteria passed, average score {avg:.1f} of 5 |")
-        lines += ["", "| Test case | Passed | Average score | Failed criteria |", "|---|---|---|---|"]
+        lines += ["", "| Test case | Result | Criteria passed | Average score | Failed criteria |", "|---|---|---|---|---|"]
         for t in judged:
             vs = t["verdicts"]
             failed = ", ".join(v["id"] for v in vs if not v["passed"]) or "none"
-            lines.append(f"| {cell(t['name'])} | {sum(v['passed'] for v in vs)} of {len(vs)} | "
+            # A test case passes only when every one of its judged criteria passes.
+            result = "PASS" if all(v["passed"] for v in vs) else "FAIL"
+            lines.append(f"| {cell(t['name'])} | {result} | {sum(v['passed'] for v in vs)} of {len(vs)} | "
                          f"{sum(v['score'] for v in vs) / len(vs):.1f} | {failed} |")
     else:
         reason = "skipped because a deterministic check failed" if skipped_judge else "not run"
@@ -439,6 +441,8 @@ def write_report(paths, skill, model, deterministic, judged, skipped_judge, meta
              f"- Usage: {usage_line(usage_totals())}"]
     if meta["version"]:
         lines.append(f"- PRD version: {meta['version']}")
+    if meta.get("prompt"):
+        lines += ["", "## Prompt", "", f"> {meta['prompt']}"]
     lines += ["", "## Summary", ""] + summary
     if meta["vs_baseline"]:
         lines += ["", f"- {meta['vs_baseline']}"]
@@ -677,8 +681,10 @@ def main():
     if args.use_skill and baseline_pct is not None:
         vs_baseline = (f"Change vs baseline: {baseline_pct:.1f}% to {score['pct']:.1f}% "
                        f"({score['pct'] - baseline_pct:+.1f} points)")
+    prompt_text = strip_frontmatter(args.bare.read_text()) if args.bare else None
     meta = {"iteration": iteration, "mode": mode, "stamp": started.strftime("%Y-%m-%d %H:%M:%S"),
-            "version": version, "vs_baseline": vs_baseline, "hypothesis": hypothesis, "change": change}
+            "version": version, "vs_baseline": vs_baseline, "hypothesis": hypothesis, "change": change,
+            "prompt": prompt_text}
     write_report(paths, args.skill, args.model, deterministic, judged, skipped_judge, meta, score, tests)
     overall, summary = summarize(deterministic, judged, skipped_judge, score)
 
